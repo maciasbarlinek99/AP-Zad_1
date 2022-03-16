@@ -49,13 +49,18 @@ fun main()
     
     // Generowanie pozycji końcowej
     var endPosition = Array<Int>(2) { (0..9).random() }
-    
-    // Zabezpieczenie: Pozycja początkowa musi być różna od końcowej
-    while(startPosition == endPosition)
+    if(9 - startPosition[0] > 5)
     {
-        endPosition = Array<Int>(2) { (0..9).random() }
+        endPosition[0] = 9
     }
+    else endPosition[0] = 0
     
+    if(9 - startPosition[1] > 5)
+    {
+        endPosition[1] = 9
+    }
+    else endPosition[1] = 0
+
     // Określenie pozycji robota na pozycji startowej
     var robotPosition = startPosition
     
