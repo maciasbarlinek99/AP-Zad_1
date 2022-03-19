@@ -2,7 +2,7 @@
  * Funkcja wykonująca ruch robota na podstawie podanej przez użytkownika komendy
  * Zabezpieczenie: przed wyjechaniem za granicę mapy
  */
-fun move(znak : Char, gRobotPos : Array<Int>) : Array<Int>
+fun move(znak : Char, gRobotPos : Array<Int>, map : Array<Array<Char>>) : Array<Int>
 {
   // Wektor przesunięcia w zależności od podanej przez użytkownika komendy
   var vecMove = when(znak)
@@ -13,8 +13,13 @@ fun move(znak : Char, gRobotPos : Array<Int>) : Array<Int>
     'R' -> arrayOf<Int>(1, 0)
     else -> arrayOf<Int>(0, 0)
   }
-  gRobotPos[0] += vecMove[0]
-  gRobotPos[1] += vecMove[1]
+  
+  // Zabezpieczenie: przed wjechaniem w przeszkodę
+  if(map[gRobotPos[0] + vecMove[0]][gRobotPos[1] + vecMove[1]] != '1')
+  {
+    gRobotPos[0] += vecMove[0]
+    gRobotPos[1] += vecMove[1]
+  }
 
   // Zabezpieczenie: przed wyjechaniem za granicę mapy
   if(gRobotPos[0] < 0)
@@ -34,6 +39,14 @@ fun main()
 {
   // Tworzenie mapy 10 x 10
   var mapPosition = Array(10) { Array<Char>(10) { '0' } }
+  
+  //Dodanie kilku przeszkód
+  val obstacles = 3
+  for(i in 0..obstacles)
+  {
+    mapPosition[(0..9).random()][(0..9).random()] = '1'
+    }
+  
   // Generowanie pozycji startowej
   var startPosition = Array<Int>(2) { (0..9).random() }
 
@@ -78,7 +91,7 @@ fun main()
 
     for(i in 0..userInput.length-1)
     {
-      robotPosition = move(userInput[i], robotPosition)
+      robotPosition = move(userInput[i], robotPosition, mapPosition)
       if(mapPosition[robotPosition[0]][robotPosition[1]] == '0')
         mapPosition[robotPosition[0]][robotPosition[1]] = 'a'
       else
