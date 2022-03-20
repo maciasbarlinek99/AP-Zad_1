@@ -1,24 +1,29 @@
 /**
  * Funkcja wykonująca ruch robota na podstawie podanej przez użytkownika komendy
- * Zabezpieczenie: przed wyjechaniem za granicę mapy
+ * Zabezpieczenia:
+ * - Przed wyjechaniem za granicę mapy
+ * - Przed wjechaniem w przeszkodę
  */
-fun move(znak : Char, gRobotPos : Array<Int>, map : Array<Array<Char>>) : Array<Int>
+fun move(znak : Char, gRobotPos : Array<Int>, gMapPos : Array<Array<Char>>) : Array<Int>
 {
   // Wektor przesunięcia w zależności od podanej przez użytkownika komendy
   var vecMove = when(znak)
   { 
-    'U' -> arrayOf<Int>(0, 1)
-    'D' -> arrayOf<Int>(0, -1)
-    'L' -> arrayOf<Int>(-1, 0)
-    'R' -> arrayOf<Int>(1, 0)
+    'U' -> arrayOf<Int>(-1, 0)
+    'D' -> arrayOf<Int>(1, 0)
+    'L' -> arrayOf<Int>(0, -1)
+    'R' -> arrayOf<Int>(0, 1)
     else -> arrayOf<Int>(0, 0)
   }
   
   // Zabezpieczenie: przed wjechaniem w przeszkodę
-  if(map[gRobotPos[0] + vecMove[0]][gRobotPos[1] + vecMove[1]] != '1')
+  if(gRobotPos[0] + vecMove[0] < 10 && gRobotPos[1] + vecMove[1] < 10)
   {
-    gRobotPos[0] += vecMove[0]
-    gRobotPos[1] += vecMove[1]
+    if(gMapPos[gRobotPos[0] + vecMove[0]][gRobotPos[1] + vecMove[1]] != '1')
+    {
+      gRobotPos[0] += vecMove[0]
+      gRobotPos[1] += vecMove[1]
+    }
   }
 
   // Zabezpieczenie: przed wyjechaniem za granicę mapy
@@ -35,6 +40,59 @@ fun move(znak : Char, gRobotPos : Array<Int>, map : Array<Array<Char>>) : Array<
   return gRobotPos
 }
 
+/**
+ * Funkcja wyświetlająca aktualną mapę oraz legendę
+ */
+fun printMap(gRobotPos : Array<Int>, gMapPos : Array<Array<Char>>)
+{
+  for(x in 0..9)
+  {
+    if(x == 0)
+    {
+      print("    ")
+      for(i in 0..9)
+      {
+        print(i)
+        print(" ")
+      }
+      println()
+      print("    ")
+      for(i in 0..18)
+      {
+        print("-")
+      }
+      println()
+    }
+    for(y in 0..9)
+    {
+      if(y == 0)
+      {
+        print(x)
+        print(" | ")
+      }
+      if(x == gRobotPos[0] && y == gRobotPos[1])
+      {
+        print("R ")
+      }
+      else
+      {
+        print(gMapPos[x][y] + " ")
+      }
+    }
+    println()
+  }
+  println()
+  println("Legenda:")
+  println("--------------------------")
+  println(" -> R - pozycja robota")
+  println(" -> ! - pozycja końcowa")
+  println(" -> 0 - pole nieodwiedzone")
+  println(" -> 1 - przeszkoda")
+  println(" -> a-z - pole odwiedzone")
+  println("---------------------------")
+  println()
+}
+
 fun main()
 {
   // Tworzenie mapy 10 x 10
@@ -45,7 +103,7 @@ fun main()
   for(i in 0..obstacles)
   {
     mapPosition[(0..9).random()][(0..9).random()] = '1'
-    }
+  }
   
   // Generowanie pozycji startowej
   var startPosition = Array<Int>(2) { (0..9).random() }
@@ -67,17 +125,8 @@ fun main()
 
   do
   {
-    // Wyświetla aktualną pozycję robota oraz pozycję końcową
-    for (array in mapPosition) {
-      for (value in array)
-        print(value + " ")
-      println()
-    }
-
-    println("------------------------------")
-    println("Pozycja robota: (" + robotPosition[0] + ", " + robotPosition[1] + ")")
-    println("Pozycja końcowa: (" + endPosition[0] + ", " + endPosition[1] + ")")
-    println("------------------------------")
+    // Wyświetla aktualną pozycję robota, pozycję końcową oraz przeszkody
+    printMap(robotPosition, mapPosition)
 
     // Wczytanie tekstu od użytkownika
     print("Wprowadź komendę: ")
@@ -100,5 +149,5 @@ fun main()
   }
   while(!(robotPosition[0] == endPosition[0] && robotPosition[1] == endPosition[1]))
 
-  println("Koniec gry")
+  println("Gratulacje! Doszedłeś do mety i wygrałeś grę")
 }
